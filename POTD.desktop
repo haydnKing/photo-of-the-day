@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Exec=~/.photo_of_the_day/POTD.py
+Exec=sh -c "python ~/.photo_of_the_day/POTD.py"
 Hidden=false
 NoDisplay=false
 X-GNOME-Autostart-enabled=true
