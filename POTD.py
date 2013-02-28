@@ -9,6 +9,7 @@ BG_DIR=os.path.expanduser("~/.photo_of_the_day/")
 SCHEMA = 'org.gnome.desktop.background'
 KEY = 'picture-uri'
 
+print __file__
 if not os.path.isdir(BG_DIR):
 	os.mkdir(BG_DIR)
 
@@ -47,7 +48,8 @@ def set_bg(fname):
 def rm_other(tail):
 	"""Remove old images from the directory"""
 	for f in os.listdir(BG_DIR):
-		if f != tail:
+		#don't delete the current image, or myself...
+		if f != tail and f != __file__:
 			os.remove(os.path.join(BG_DIR, f))
 
 def update():

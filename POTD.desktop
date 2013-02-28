@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Exec=~/.photo_of_the_day/POTD.py
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=photo-of-the-day
+Name=photo-of-the-day
+Comment[en_US]=
+Comment=
