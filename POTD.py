@@ -49,7 +49,7 @@ def rm_other(tail):
 	"""Remove old images from the directory"""
 	for f in os.listdir(BG_DIR):
 		#don't delete the current image, or myself...
-		if f != tail and f != __file__:
+		if f != tail and f != 'POTD.py':
 			os.remove(os.path.join(BG_DIR, f))
 
 def update():
