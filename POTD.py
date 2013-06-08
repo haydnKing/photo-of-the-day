@@ -9,7 +9,6 @@ BG_DIR=os.path.expanduser("~/.photo_of_the_day/")
 SCHEMA = 'org.gnome.desktop.background'
 KEY = 'picture-uri'
 
-print __file__
 if not os.path.isdir(BG_DIR):
 	os.mkdir(BG_DIR)
 
@@ -20,10 +19,19 @@ def get_photo_url():
 		u = urllib2.urlopen(BASE_URL)
 		html = u.read()
 
-		soup = BeautifulSoup(html)
+		soup = BeautifulSoup(html, "html5lib")
+
 		for div in soup.find_all('div'):
 			if 'download_link' in div.get('class', ''):
 				url = div.find('a').get('href', '')
+				break
+
+		if not url:
+			for div in soup.find_all('div'):
+				if 'primary_photo' in div.get('class', ''):
+					url = div.find('img').get('src', '')
+					break
+
 	except urllib2.URLError as e:
 		print "Error fetching page: {}".format(str(e))
 	return url
@@ -42,6 +50,7 @@ def fetch_image(url, fname):
 
 def set_bg(fname):
 	"""Set the file fname as the desktop background"""
+	print "Setting background \'{}\'".format(fname)
 	gsettings = Gio.Settings.new(SCHEMA)
 	gsettings.set_string(KEY, "file://{}".format(fname))
 
