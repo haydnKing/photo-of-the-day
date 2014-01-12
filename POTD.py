@@ -4,7 +4,7 @@ import urllib2, urlparse, os, os.path, datetime, time
 from bs4 import BeautifulSoup
 from gi.repository import Gio
 
-BASE_URL="http://photography.nationalgeographic.com/photography/photo-of-the-day/"
+BASE_URL="http://photography.nationalgeographic.com/photo-of-the-day/"
 BG_DIR=os.path.expanduser("~/.photo_of_the_day/")
 SCHEMA = 'org.gnome.desktop.background'
 KEY = 'picture-uri'
@@ -34,6 +34,10 @@ def get_photo_url():
 
 	except urllib2.URLError as e:
 		print "Error fetching page: {}".format(str(e))
+
+	if url.startswith("//"):
+		url = "http:{}".format(url)
+	
 	return url
 
 def fetch_image(url, fname):
