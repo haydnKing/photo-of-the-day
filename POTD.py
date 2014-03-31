@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import urllib2, urlparse, os, os.path, datetime, time
+import urllib3, urlparse, os, os.path, datetime, time
 from bs4 import BeautifulSoup
 from gi.repository import Gio
 
@@ -9,47 +9,49 @@ BG_DIR=os.path.expanduser("~/.photo_of_the_day/")
 SCHEMA = 'org.gnome.desktop.background'
 KEY = 'picture-uri'
 
+http = urllib3.PoolManager()
+
 if not os.path.isdir(BG_DIR):
 	os.mkdir(BG_DIR)
 
 def get_photo_url():
 	"""Get the url of today's photo from the National Geographic website"""
 	url = ''
-	try:
-		u = urllib2.urlopen(BASE_URL)
-		html = u.read()
+	r = http.request('GET', BASE_URL)
+	if(r.status != 200):
+		raise IOError("Failed to load url \'{}\'".format(BASE_URL))
 
-		soup = BeautifulSoup(html, "html5lib")
+	soup = BeautifulSoup(r.data)
 
-		for div in soup.find_all('div'):
-			if 'download_link' in div.get('class', ''):
-				url = div.find('a').get('href', '')
-				break
+	f = open(os.path.join(BG_DIR, 'page.html'), 'w');
+	f.write(soup.prettify().encode('utf8'))
+	f.close()
+	
+	for div in soup.find_all('div', class_='download_link'):
+		url = div.find('a').get('href', '')
+		break
 
-		if not url:
-			for div in soup.find_all('div'):
-				if 'primary_photo' in div.get('class', ''):
-					url = div.find('img').get('src', '')
-					break
-
-	except urllib2.URLError as e:
-		print "Error fetching page: {}".format(str(e))
+	if not url:
+		for div in soup.find_all('div', class_='primary_photo'):
+			url = div.find('img').get('src', '')
+			break
 
 	if url.startswith("//"):
 		url = "http:{}".format(url)
+
+	if not url:
+		raise RuntimeError("Could not find image url")
 	
 	return url
 
 def fetch_image(url, fname):
 	"""Fetch the image given by url and save it in fname"""
-	try:
-		u = urllib2.urlopen(url)
-		image = u.read()
-		f = open(fname, 'wb')
-		f.write(image)
-	except urllib2.URLError as e:
-		print "Error fetching image: {}".format(str(e))
-		return False
+	r = http.request('GET', url);
+	if(r.status != 200):
+		raise IOError("Error fetching image \'{}\'".format(url))
+	image = r.data
+	f = open(fname, 'wb')
+	f.write(image)
 	return True
 
 def set_bg(fname):
