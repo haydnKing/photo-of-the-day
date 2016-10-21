@@ -44,7 +44,7 @@ def get_photo_info():
     if not url:
         raise RuntimeError("Could not find image url")
 
-    return title, url
+    return title.encode('utf-8'), url
 
 def fetch_image(url, fname):
     """Fetch the image given by url and save it in fname"""
